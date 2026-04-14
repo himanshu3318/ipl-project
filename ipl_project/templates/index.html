@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPL Stats & Rankings | CricStats Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+<!-- ─── TOP BAR ────────────────────────────── -->
+<div class="top-bar">
+  <span class="live">● LIVE</span>
+  <span>IPL 2026 • Season 19 • 74 Matches • Mar 28 – May 31, 2026</span>
+  <span style="margin-left:auto">📅 Defending Champions: Royal Challengers Bengaluru</span>
+</div>
+
+<!-- ─── LIVE TICKER ─────────────────────────── -->
+<div class="ticker-bar">
+  <div class="ticker-label">LIVE</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div>
+</div>
+
+<!-- ─── MAIN NAVIGATION ──────────────────────── -->
+<div class="main-nav">
+  <div class="nav-inner">
+    <a class="logo-area" href="#">
+      <div class="logo-circle">IPL</div>
+      <div>
+        <div class="logo-txt">CricStats</div>
+        <div class="logo-sub">IPL Analytics Hub</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-a active" onclick="showPage('stats',this)">Stats</a>
+      <a class="nav-a" onclick="showPage('points',this)">Points Table</a>
+      <a class="nav-a" onclick="showPage('awards',this)">Awards <span class="nav-badge">NEW</span></a>
+      <a class="nav-a" onclick="showPage('records',this)">Records</a>
+    </div>
+     <div class="nav-logo">
+    <a href="/dhurandhar" target="_blank">
+      <img src="{{ url_for('static', filename='images/dhurandhar.png') }}" alt="Dhurandhar Logo">
+    </a>
+  </div>
+  </div>
+</div>
+
+<!-- ─── HERO / CAP HOLDER BANNER ─────────────── -->
+<div class="hero" id="hero-section">
+  <div class="hero-bg-num">1</div>
+  <div class="hero-inner">
+    <div class="hero-player-wrap">
+      <img id="hero-img" class="hero-player-img" src="" alt=""
+           onerror="this.style.display='none';document.getElementById('hero-fallback').style.display='flex'">
+      <div id="hero-fallback" class="hero-player-fallback" style="display:none">VS</div>
+    </div>
+    <div class="hero-info">
+      <div class="hero-cap-pill" id="hero-cap-label">🟠 Orange Cap Holder</div>
+      <div class="hero-name" id="hero-name">Loading...</div>
+      <div class="hero-meta">
+        <span class="hero-team-tag pill p-rr" id="hero-team">—</span>
+        <span class="hero-country" id="hero-country">🏏 Top Run-Scorer</span>
+      </div>
+      <div class="hero-stats-row">
+        <div class="hero-stat"><span class="hero-stat-val" id="hs0">—</span><span class="hero-stat-key">Runs</span></div>
+        <div class="hero-stat"><span class="hero-stat-val" id="hs1">—</span><span class="hero-stat-key">Matches</span></div>
+        <div class="hero-stat"><span class="hero-stat-val" id="hs2">—</span><span class="hero-stat-key">Average</span></div>
+        <div class="hero-stat"><span class="hero-stat-val" id="hs3">—</span><span class="hero-stat-key">Strike Rate</span></div>
+        <div class="hero-stat"><span class="hero-stat-val" id="hs4">—</span><span class="hero-stat-key">HS</span></div>
+        <div class="hero-stat"><span class="hero-stat-val" id="hs5">—</span><span class="hero-stat-key">100s/50s</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FILTER / CONTROL BAR ─────────────────── -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <!-- Batting / Bowling toggle -->
+    <div class="tab-switcher">
+      <button class="tab-sw-btn active" onclick="switchStatType('batting',this)">Batting</button>
+      <button class="tab-sw-btn"        onclick="switchStatType('bowling',this)">Bowling</button>
+    </div>
+
+    <!-- Season dropdown -->
+    <select class="fselect" id="season-sel" onchange="onSeasonChange()">
+      <option value="2026">Season 2026</option>
+      <option value="2025">Season 2025</option>
+      <option value="2024">Season 2024</option>
+      <option value="2023">Season 2023</option>
+      <option value="2022">Season 2022</option>
+      <option value="2021">Season 2021</option>
+      <option value="2020">Season 2020</option>
+      <option value="2019">Season 2019</option>
+      <option value="2018">Season 2018</option>
+      <option value="2017">Season 2017</option>
+      <option value="2016">Season 2016</option>
+      <option value="2015">Season 2015</option>
+      <option value="2014">Season 2014</option>
+      <option value="2013">Season 2013</option>
+      <option value="2012">Season 2012</option>
+      <option value="2011">Season 2011</option>
+      <option value="2010">Season 2010</option>
+      <option value="2009">Season 2009</option>
+      <option value="2008">Season 2008</option>
+    </select>
+
+    <!-- Stat category (Orange Cap / Purple Cap) -->
+    <select class="fselect" id="cap-sel" onchange="switchStatType(this.value==='purple'?'bowling':'batting', null)">
+      <option value="orange">Orange Cap</option>
+      <option value="purple">Purple Cap</option>
+    </select>
+
+    <!-- Team filter -->
+    <select class="fselect" id="team-filter" onchange="filterByTeam()">
+      <option value="">All Teams</option>
+    </select>
+
+    <!-- Indian / Overseas filter -->
+    <select class="fselect" id="player-filter" onchange="filterByOrigin()">
+      <option value="">All Players</option>
+      <option value="indian">Indian</option>
+      <option value="overseas">Overseas</option>
+    </select>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Search By Player Name" id="search-input" oninput="doSearch()">
+    </div>
+  </div>
+</div>
+
+<!-- ─── MAIN CONTENT ─────────────────────────── -->
+<div class="main-content">
+
+  <!-- ══════════ STATS PAGE ══════════ -->
+  <div id="page-stats" class="page-sec active">
+
+    <!-- Batting sub-tabs -->
+    <div class="sub-tabs">
+      <button class="stab active" onclick="showSubTab('batting-tabs',this)">Most Runs</button>
+      <button class="stab"        onclick="showSubTab('batting-sr',this)">Best Strike Rate</button>
+      <button class="stab"        onclick="showSubTab('batting-avg',this)">Best Average</button>
+      <button class="stab"        onclick="showSubTab('batting-6s',this)">Most Sixes</button>
+      <button class="stab"        onclick="showSubTab('batting-100s',this)">Most 100s</button>
+    </div>
+
+    <!-- Most Runs -->
+    <div id="batting-tabs" class="tab-sec active">
+      <div class="last-upd" id="last-upd-txt">Loading...</div>
+      <div class="tbl-wrap">
+        <table class="stbl" id="main-batting-tbl">
+          <thead><tr>
+            <th>POS</th><th>Player</th>
+            <th>Runs ▼</th><th>Mat</th><th>Inns</th><th>NO</th>
+            <th>HS</th><th>Avg</th><th>BF</th><th>SR</th>
+            <th>100</th><th>50</th><th>4s</th><th>6s</th>
+          </tr></thead>
+          <tbody id="main-batting-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Best SR -->
+    <div id="batting-sr" class="tab-sec">
+      <div class="tbl-wrap">
+        <table class="stbl">
+          <thead><tr><th>POS</th><th>Player</th><th>SR ▼</th><th>Mat</th><th>Runs</th><th>HS</th><th>Avg</th><th>6s</th></tr></thead>
+          <tbody id="sr-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Best Avg -->
+    <div id="batting-avg" class="tab-sec">
+      <div class="tbl-wrap">
+        <table class="stbl">
+          <thead><tr><th>POS</th><th>Player</th><th>Avg ▼</th><th>Mat</th><th>Runs</th><th>HS</th><th>SR</th><th>50s</th></tr></thead>
+          <tbody id="avg-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Most Sixes -->
+    <div id="batting-6s" class="tab-sec">
+      <div class="tbl-wrap">
+        <table class="stbl">
+          <thead><tr><th>POS</th><th>Player</th><th>6s ▼</th><th>Mat</th><th>Runs</th><th>SR</th><th>HS</th></tr></thead>
+          <tbody id="sixes-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Most 100s -->
+    <div id="batting-100s" class="tab-sec">
+      <div class="tbl-wrap">
+        <table class="stbl">
+          <thead><tr><th>POS</th><th>Player</th><th>100s ▼</th><th>Mat</th><th>Runs</th><th>50s</th><th>Avg</th></tr></thead>
+          <tbody id="hundreds-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Bowling sub-section (hidden by default) ── -->
+    <div id="bowling-section" style="display:none">
+      <div class="sub-tabs">
+        <button class="stab active" onclick="showSubTab('bowling-wkts',this)">Most Wickets</button>
+        <button class="stab"        onclick="showSubTab('bowling-econ',this)">Best Economy</button>
+        <button class="stab"        onclick="showSubTab('bowling-avg',this)">Best Average</button>
+        <button class="stab"        onclick="showSubTab('bowling-sr',this)">Best Strike Rate</button>
+      </div>
+
+      <!-- Most Wickets -->
+      <div id="bowling-wkts" class="tab-sec active">
+        <div class="tbl-wrap">
+          <table class="stbl">
+            <thead><tr><th>POS</th><th>Player</th><th>Wkts ▼</th><th>Mat</th><th>Overs</th><th>Runs</th><th>Avg</th><th>Econ</th><th>SR</th><th>4W</th><th>5W</th><th>Best</th></tr></thead>
+            <tbody id="bowl-wkts-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Best Economy -->
+      <div id="bowling-econ" class="tab-sec">
+        <div class="tbl-wrap">
+          <table class="stbl">
+            <thead><tr><th>POS</th><th>Player</th><th>Econ ▼</th><th>Mat</th><th>Wkts</th><th>Overs</th><th>Avg</th><th>Best</th></tr></thead>
+            <tbody id="bowl-econ-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Best Bowling Avg -->
+      <div id="bowling-avg" class="tab-sec">
+        <div class="tbl-wrap">
+          <table class="stbl">
+            <thead><tr><th>POS</th><th>Player</th><th>Avg ▼</th><th>Mat</th><th>Wkts</th><th>Econ</th><th>SR</th><th>Best</th></tr></thead>
+            <tbody id="bowl-avg-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Best Bowling SR -->
+      <div id="bowling-sr" class="tab-sec">
+        <div class="tbl-wrap">
+          <table class="stbl">
+            <thead><tr><th>POS</th><th>Player</th><th>SR ▼</th><th>Mat</th><th>Wkts</th><th>Econ</th><th>Avg</th><th>Best</th></tr></thead>
+            <tbody id="bowl-sr-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /bowling-section -->
+
+    <button class="view-all" style="margin-top:8px">View All Players</button>
+  </div><!-- /page-stats -->
+
+
+  <!-- ══════════ POINTS TABLE PAGE ══════════ -->
+  <div id="page-points" class="page-sec" style="display:none">
+    <div id="champ-banner-wrap"></div>
+    <div class="sec-hdr">
+      <div class="sec-title" id="pts-title">IPL 2026 — Points Table</div>
+      <div class="last-upd" style="margin:0" id="pts-upd">Loading...</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="pts-tbl">
+        <thead><tr>
+          <th>Rank</th><th>Team</th><th>P</th><th>W</th><th>L</th>
+          <th>NR</th><th>Pts</th><th>NRR</th><th>Form</th>
+        </tr></thead>
+        <tbody id="pts-tbody"></tbody>
+      </table>
+    </div>
+  </div><!-- /page-points -->
+
+
+  <!-- ══════════ AWARDS PAGE ══════════ -->
+  <div id="page-awards" class="page-sec" style="display:none">
+    <div class="cap-cards-row" id="cap-cards"></div>
+    <div class="sec-hdr">
+      <div class="sec-title" id="awards-title">IPL 2026 — Awards</div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="awards-sub-tbl">
+        <thead><tr>
+          <th>Award</th><th>Winner</th><th>Team</th><th>Stat</th><th>Season</th>
+        </tr></thead>
+        <tbody id="awards-tbody"></tbody>
+      </table>
+    </div>
+  </div><!-- /page-awards -->
+
+
+  <!-- ══════════ RECORDS PAGE ══════════ -->
+  <div id="page-records" class="page-sec" style="display:none">
+    <div class="sec-hdr"><div class="sec-title">IPL All-Time Records</div></div>
+    <div class="records-grid" id="records-grid"></div>
+
+    <div class="sec-hdr" style="margin-top:24px"><div class="sec-title">All-Time Run Scorers</div></div>
+    <div class="tbl-wrap">
+      <table class="stbl">
+        <thead><tr>
+          <th>POS</th><th>Player</th><th>Runs ▼</th><th>Mat</th><th>Inns</th>
+          <th>Avg</th><th>SR</th><th>100s</th><th>50s</th><th>HS</th>
+        </tr></thead>
+        <tbody id="alltime-bat-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="sec-hdr" style="margin-top:24px"><div class="sec-title">All-Time Wicket Takers</div></div>
+    <div class="tbl-wrap">
+      <table class="stbl">
+        <thead><tr>
+          <th>POS</th><th>Player</th><th>Wkts ▼</th><th>Mat</th>
+          <th>Avg</th><th>Econ</th><th>SR</th><th>Best</th>
+        </tr></thead>
+        <tbody id="alltime-bowl-tbody"></tbody>
+      </table>
+    </div>
+  </div><!-- /page-records -->
+
+</div><!-- /main-content -->
+
+<!-- ─── FOOTER ───────────────────────────────── -->
+<footer>
+  <div class="footer-canvas-wrap">
+    <canvas id="footerCanvas"></canvas>
+  </div>
+  <p class="footer-sub-text">
+    IPL CricStats Hub &nbsp;·&nbsp; Data Science Project &nbsp;·&nbsp; B.Tech
+  </p>
+</footer>
+<!-- ─── SCRIPTS ──────────────────────────────── -->
+<script src="../static/js/app.js"></script>
+</body>
+</html>

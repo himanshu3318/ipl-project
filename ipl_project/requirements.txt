@@ -1,0 +1,4 @@
+# IPL CricStats Hub — Python Dependencies
+flask>=3.0.0
+flask
+gunicorn
